@@ -1,0 +1,60 @@
+import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+
+import '../screen/login_screen.dart';
+import '../screen/question_screen.dart';
+import '../screen/splash_screen.dart';
+
+class AppRoutes {
+  static const String splash = '/';
+  static const String login = '/login';
+  static const String question = '/question';
+}
+
+GoRouter createRouter() {
+  final rootNavigatorKey = GlobalKey<NavigatorState>();
+
+  return GoRouter(
+    navigatorKey: rootNavigatorKey,
+    initialLocation: AppRoutes.splash,
+    routes: [
+      GoRoute(
+        path: AppRoutes.splash,
+        name: 'splash',
+        builder: (context, state) => const SplashScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.login,
+        name: 'login',
+        builder: (context, state) => const LoginScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.question,
+        name: 'question',
+        builder: (context, state) => const QuestionScreen(),
+      ),
+    ],
+    errorBuilder: (context, state) => Scaffold(
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(Icons.error, size: 64, color: Colors.red),
+            const SizedBox(height: 16),
+            Text(
+              '404 - Page Not Found',
+              style: Theme.of(context).textTheme.headlineMedium,
+            ),
+            const SizedBox(height: 8),
+            Text('Path: ${state.uri.path}'),
+            const SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: () => context.go(AppRoutes.splash),
+              child: const Text('Go to Splash'),
+            ),
+          ],
+        ),
+      ),
+    ),
+  );
+}

@@ -21,36 +21,12 @@ class _SplashScreenState extends State<SplashScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final screenHeight = MediaQuery.of(context).size.height;
-
-    return Scaffold(
-      backgroundColor: const Color(0xFF191970),
+    return const Scaffold(
+      backgroundColor: Color(0xFF191970),
       body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              width: screenWidth * 0.35,
-              height: screenWidth * 0.35,
-              decoration: const BoxDecoration(
-                image: DecorationImage(
-                  image: AssetImage('assets/images/icon.png'),
-                  fit: BoxFit.contain,
-                ),
-              ),
-            ),
-            SizedBox(height: screenHeight * 0.03),
-            Text(
-              'QuizMaster',
-              style: TextStyle(
-                fontSize: screenWidth * 0.08,
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-                letterSpacing: 1.2,
-              ),
-            ),
-          ],
+        child: Text(
+          'Kwizly',
+          style: TextStyle(color: Colors.white, fontSize: 32, fontWeight: FontWeight.bold),
         ),
       ),
     );

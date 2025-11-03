@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+
 import '../config/routes.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -21,12 +22,30 @@ class _SplashScreenState extends State<SplashScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      backgroundColor: Color(0xFF191970),
+    return Scaffold(
+      backgroundColor: const Color(0xFF191970),
       body: Center(
-        child: Text(
-          'Kwizly',
-          style: TextStyle(color: Colors.white, fontSize: 32, fontWeight: FontWeight.bold),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+
+            Image.asset(
+              'lib/aset/img/icon.png',
+              width: 300,
+              height: 300,
+            ),
+            const SizedBox(height: 0),
+
+            const Text(
+              'Kwizly',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 36,
+                fontWeight: FontWeight.bold,
+                letterSpacing: 1.5,
+              ),
+            ),
+          ],
         ),
       ),
     );

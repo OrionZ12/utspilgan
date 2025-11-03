@@ -3,11 +3,11 @@ import 'package:go_router/go_router.dart';
 import 'config//routes.dart';
 
 void main() {
-  runApp(const QuizApp());
+  runApp(const MyApp());
 }
 
-class QuizApp extends StatelessWidget {
-  const QuizApp({super.key});
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -18,6 +18,7 @@ class QuizApp extends StatelessWidget {
       title: 'Kwizly',
       routerConfig: router,
       theme: ThemeData(
+        fontFamily: 'ComicRelief',
         colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF6A0DAD)),
         useMaterial3: true,
       ),

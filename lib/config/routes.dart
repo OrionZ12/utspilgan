@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-import '../screen/login_screen.dart';
-import '../screen/question_screen.dart';
-import '../screen/splash_screen.dart';
+import 'package:utspilgan/screen/login_screen.dart';
+import 'package:utspilgan/screen/question_screen.dart';
+import 'package:utspilgan/screen/splash_screen.dart';
 
 class AppRoutes {
   static const String splash = '/';

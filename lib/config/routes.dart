@@ -4,13 +4,13 @@ import 'package:go_router/go_router.dart';
 import 'package:utspilgan/screen/login_screen.dart';
 import 'package:utspilgan/screen/question_screen.dart';
 import 'package:utspilgan/screen/splash_screen.dart';
-import 'package:utspilgan/screen/ending_screen.dart'; // ⬅️ tambahkan import ini
+import 'package:utspilgan/screen/ending_screen.dart';
 
 class AppRoutes {
   static const String splash = '/';
   static const String login = '/login';
   static const String question = '/question';
-  static const String ending = '/ending'; // ⬅️ tambahkan ini
+  static const String ending = '/ending';
 }
 
 GoRouter createRouter() {
@@ -36,7 +36,6 @@ GoRouter createRouter() {
         builder: (context, state) => const QuestionScreen(),
       ),
 
-      // 🟩 Route untuk EndingScreen
       GoRoute(
         path: AppRoutes.ending,
         name: 'ending',
@@ -46,7 +45,6 @@ GoRouter createRouter() {
             correctAnswers: args['benar'],
             totalQuestions: args['total'],
             totalTime: args['time'],
-            imagePath: 'lib/aset/img/Jean.jpg',
           );
         },
       ),

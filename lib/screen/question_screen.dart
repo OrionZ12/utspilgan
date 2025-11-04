@@ -11,7 +11,6 @@ import '../provider/name_saver.dart';
 
 class QuestionScreen extends StatefulWidget {
   const QuestionScreen({Key? key}) : super(key: key);
-
   @override
   State<QuestionScreen> createState() => _QuestionScreenState();
 }
@@ -109,7 +108,7 @@ class _QuestionScreenState extends State<QuestionScreen> {
   Widget build(BuildContext context) {
     final q = questionList.isNotEmpty
         ? questionList[currentQuestionIndex]
-        : {'question': 'No question', 'options': ['-', '-', '-', '-']};
+        : {'question': 'Soal tidak kebaca', 'options': ['-', '-', '-', '-']};
 
     final options = List<String>.from(q['options'] as List);
 
@@ -192,7 +191,7 @@ class _QuestionScreenState extends State<QuestionScreen> {
 
                         SizedBox(height: screenHeight * 0.05),
 
-                        // Box soal (responsif)
+                        //Box Soal
                         Container(
                           width: double.infinity,
                           padding: const EdgeInsets.all(20),
@@ -228,7 +227,7 @@ class _QuestionScreenState extends State<QuestionScreen> {
 
                         SizedBox(height: screenHeight * 0.08),
 
-                        // Box opsi (responsif)
+                        //Box opsi
                         Flexible(
                           child: Padding(
                             padding: const EdgeInsets.only(bottom: 24),

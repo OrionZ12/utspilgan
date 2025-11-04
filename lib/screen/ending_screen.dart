@@ -3,22 +3,20 @@ import 'package:go_router/go_router.dart';
 import '../config/routes.dart';
 
 class EndingScreen extends StatelessWidget {
-  final int correctAnswers; // Z = jumlah benar
-  final int totalQuestions; // Y = total soal (misal 10)
-  final int totalTime; // t = waktu total (dalam detik)
-  final String imagePath; // path gambar
+  final int correctAnswers;
+  final int totalQuestions;
+  final int totalTime;
 
   const EndingScreen({
     Key? key,
     required this.correctAnswers,
     required this.totalQuestions,
     required this.totalTime,
-    required this.imagePath,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    // Rumus skor akhir: Z * (1/t) * 1000
+
     double score = 0;
     if (totalTime > 0) {
       score = correctAnswers * (1 / totalTime) * 1000;
@@ -55,7 +53,7 @@ class EndingScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 40),
 
-                    // Gambar dengan frame bulat
+                    //img
                     ClipOval(
                       child: Container(
                         width: imageSize,
@@ -65,7 +63,7 @@ class EndingScreen extends StatelessWidget {
                           fit: BoxFit.cover,
                           alignment: Alignment.center,
                           child: Image.asset(
-                            imagePath,
+                            'lib/aset/img/Jean.jpg',
                             width: imageSize,
                             height: imageSize,
                             fit: BoxFit.cover,
@@ -77,7 +75,7 @@ class EndingScreen extends StatelessWidget {
                     const SizedBox(height: 40),
 
                     Text(
-                      "Anda berhasil menjawab $correctAnswers/$totalQuestions soal dengan benar",
+                      "Anda menjawab $correctAnswers/$totalQuestions soal dengan benar",
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: fontBody,

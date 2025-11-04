@@ -1,16 +1,12 @@
-# uaspilgan
+Nama: Sulung Ismanara
+NIM: 231401060
+Lab: 5
 
-A new Flutter project.
+Deskripsi Aplikasi:
+  Aplikasi yang saya buat adalah aplikasi quiz pilihan ganda dgn judul "Kwizly", dimana pengguna akan menjawab 10 soal pilihan ganda yang berbeda-beda, kemudian skor akan dihitung berdasarkan jumlah pertanyaan yang dijawab dengan benar.
 
-## Getting Started
 
-This project is a starting point for a Flutter application.
+Sumber aset yang digunakan:
+icon.png: gemini.google.com
+Jean.jpg: https://x.com/GenshinImpactID/status/1768124938379243868
 
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.

@@ -35,7 +35,7 @@ final List<Map<String, dynamic>> questionList = [
     'answer': '2 jam 35 menit',
   },
   {
-    'question': 'Sebuah tangki air dapat menampung 500 liter air. Jika sebuah keran mengalirkan air sebanyak 20 liter per menit, berapa waktu yang dibutuhkan untuk mengisi penuh tangki?',
+    'question': 'Sebuah tangki berkapasitas 500 liter diisi keran 20 liter/menit. Berapa menit hingga penuh?',
     'options': ['20 menit', '25 menit', '30 menit', '35 menit'],
     'answer': '25 menit',
   },
@@ -45,7 +45,7 @@ final List<Map<String, dynamic>> questionList = [
     'answer': 'Rp200.000',
   },
   {
-    'question': 'Dua pekerja dapat menyelesaikan sebuah proyek dalam 6 hari jika bekerja bersama. Jika pekerja pertama bisa menyelesaikan sendiri dalam 10 hari, berapa hari yang dibutuhkan pekerja kedua untuk menyelesaikan sendiri?',
+    'question': 'Dua pekerja menyelesaikan proyek dalam 6 hari bersama. Pekerja pertama sendiri 10 hari. Berapa hari pekerja kedua sendiri?',
     'options': ['12 hari', '14 hari', '15 hari', '20 hari'],
     'answer': '15 hari',
   },

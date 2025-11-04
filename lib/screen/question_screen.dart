@@ -1,5 +1,13 @@
+import 'dart:async';
+import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:auto_size_text/auto_size_text.dart';
+import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
+import '../config/routes.dart';
 import '../question/question_list.dart';
+import '../widget/opsiopsi.dart';
+import '../provider/name_saver.dart';
 
 class QuestionScreen extends StatefulWidget {
   const QuestionScreen({Key? key}) : super(key: key);
@@ -11,60 +19,246 @@ class QuestionScreen extends StatefulWidget {
 class _QuestionScreenState extends State<QuestionScreen> {
   late final String playerName;
   int currentQuestionIndex = 0;
+  int benar = 0;
+
+  final List<int> _usedQuestionIndexes = []; //Menyimpan index yang sudah keluar
+  final Random _random = Random();
+
+  // Timer (stopwatch)
+  int elapsedSeconds = 0;
+  Timer? _timer;
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    final extra = ModalRoute.of(context)?.settings.arguments ?? (ModalRoute.of(context)?.settings.arguments ?? {});
-    // try both common ways (GoRouter uses state.extra when using go(..., extra: {...}))
+    final extra = ModalRoute.of(context)?.settings.arguments;
     final routeExtra = (extra is Map) ? extra : {};
     playerName = (routeExtra['playerName'] as String?) ?? 'Guest';
+    _startTimer();
+
+    //Soal pertama acak
+    _generateNewQuestion();
+  }
+
+  void _startTimer() {
+    _timer?.cancel();
+    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      setState(() {
+        elapsedSeconds++;
+      });
+    });
+  }
+
+  //Ambil soal baru secara acak tanpa pengulangan
+  // Ambil soal baru secara acak tanpa pengulangan
+  void _generateNewQuestion() {
+    // Jika semua soal sudah keluar, akhiri kuis
+    if (_usedQuestionIndexes.length >= questionList.length) {
+      _showQuizEndDialog();
+      return;
+    }
+
+    int newIndex;
+    do {
+      newIndex = _random.nextInt(questionList.length);
+    } while (_usedQuestionIndexes.contains(newIndex));
+
+    if (mounted) {
+      setState(() {
+        _usedQuestionIndexes.add(newIndex);
+        currentQuestionIndex = newIndex;
+      });
+    }
+  }
+
+  //Ketika opsi dipilih
+  void _onOptionSelected(String selectedOption) {
+    final correctAnswer = questionList[currentQuestionIndex]['answer'] as String;
+
+    if (selectedOption == correctAnswer) {
+      benar++;
+      debugPrint('Benar! Total benar: $benar');
+    } else {
+      debugPrint('Salah. Jawaban benar: $correctAnswer');
+    }
+
+    // Tunggu sedikit supaya user sempat lihat pilihan
+    Future.delayed(const Duration(milliseconds: 500), () {
+      _generateNewQuestion();
+    });
+  }
+
+  //Ketika semua soal habis
+  void _showQuizEndDialog() {
+    _timer?.cancel();
+
+    context.go(
+      AppRoutes.ending,
+      extra: {
+        'benar': benar,
+        'total': questionList.length,
+        'time': elapsedSeconds,
+      },
+    );
+  }
+
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  String _formatTime(int seconds) {
+    final minutes = (seconds ~/ 60).toString().padLeft(2, '0');
+    final secs = (seconds % 60).toString().padLeft(2, '0');
+    return "$minutes:$secs";
   }
 
   @override
   Widget build(BuildContext context) {
-    final q = questionList.isNotEmpty ? questionList[currentQuestionIndex] : {'question': 'No question', 'options': ['-','-','-','-']};
+    final q = questionList.isNotEmpty
+        ? questionList[currentQuestionIndex]
+        : {'question': 'No question', 'options': ['-', '-', '-', '-']};
+
     final options = List<String>.from(q['options'] as List);
+
     return Scaffold(
+      backgroundColor: const Color(0xFF191970),
+
       appBar: AppBar(
-        title: const Text('Kwizly'),
-        actions: [Padding(padding: const EdgeInsets.all(8.0), child: Center(child: Text(playerName)))],
+        backgroundColor: const Color(0xFF6495ED),
+        title: const Text(
+          'Kwizly',
+          style: TextStyle(
+            fontSize: 32,
+            fontWeight: FontWeight.bold,
+            color: Colors.black,
+            letterSpacing: 1.2,
+          ),
+        ),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12.0),
+            child: Center(
+              child: Consumer<NameSaver>(
+                builder: (context, nameSaver, _) => Text(
+                  nameSaver.name.isNotEmpty ? nameSaver.name : playerName,
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
+
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12)),
-              child: Text(q['question'] as String, textAlign: TextAlign.center),
+            // Timer di kanan atas
+            Align(
+              alignment: Alignment.topRight,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.2),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: Colors.white24, width: 1),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(Icons.timer, color: Colors.white, size: 20),
+                    const SizedBox(width: 6),
+                    Text(
+                      _formatTime(elapsedSeconds),
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
-            const SizedBox(height: 24),
-            Expanded(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  _option(options[0], Colors.red),
-                  _option(options[1], Colors.green),
-                  _option(options[2], Colors.yellow[700]!),
-                  _option(options[3], Colors.blue),
+
+            const SizedBox(height: 40),
+
+            //Box soal
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: const Color(0xFFD6E0F0),
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.25),
+                    blurRadius: 10,
+                    spreadRadius: 5,
+                    offset: const Offset(0, 4),
+                  ),
                 ],
+              ),
+              child: SizedBox(
+                height: 150,
+                child: Center(
+                  child: AutoSizeText(
+                    q['question'] as String,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      fontSize: 28,
+                      fontWeight: FontWeight.w500,
+                    ),
+                    maxLines: 3,
+                    minFontSize: 14,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 80),
+
+            // Box opsi
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.only(bottom: 24),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    opsi(
+                      label: options[0],
+                      color: const Color(0xFFDC143C),
+                      onTap: () => _onOptionSelected(options[0]),
+                    ),
+                    opsi(
+                      label: options[1],
+                      color: const Color(0xFF3CB371),
+                      onTap: () => _onOptionSelected(options[1]),
+                    ),
+                    opsi(
+                      label: options[2],
+                      color: Colors.yellow[700]!,
+                      onTap: () => _onOptionSelected(options[2]),
+                    ),
+                    opsi(
+                      label: options[3],
+                      color: Colors.blue,
+                      onTap: () => _onOptionSelected(options[3]),
+                    ),
+                  ],
+                ),
               ),
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _option(String label, Color color) {
-    return InkWell(
-      onTap: () {},
-      child: Container(
-        width: double.infinity,
-        padding: const EdgeInsets.symmetric(vertical: 20),
-        decoration: BoxDecoration(color: color, borderRadius: BorderRadius.circular(8)),
-        child: Text(label, textAlign: TextAlign.center),
       ),
     );
   }

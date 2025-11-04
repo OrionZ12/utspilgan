@@ -21,10 +21,9 @@ class _QuestionScreenState extends State<QuestionScreen> {
   int currentQuestionIndex = 0;
   int benar = 0;
 
-  final List<int> _usedQuestionIndexes = []; //Menyimpan index yang sudah keluar
+  final List<int> _usedQuestionIndexes = [];
   final Random _random = Random();
 
-  // Timer (stopwatch)
   int elapsedSeconds = 0;
   Timer? _timer;
 
@@ -35,24 +34,21 @@ class _QuestionScreenState extends State<QuestionScreen> {
     final routeExtra = (extra is Map) ? extra : {};
     playerName = (routeExtra['playerName'] as String?) ?? 'Guest';
     _startTimer();
-
-    //Soal pertama acak
     _generateNewQuestion();
   }
 
   void _startTimer() {
     _timer?.cancel();
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      setState(() {
-        elapsedSeconds++;
-      });
+      if (mounted) {
+        setState(() {
+          elapsedSeconds++;
+        });
+      }
     });
   }
 
-  //Ambil soal baru secara acak tanpa pengulangan
-  // Ambil soal baru secara acak tanpa pengulangan
   void _generateNewQuestion() {
-    // Jika semua soal sudah keluar, akhiri kuis
     if (_usedQuestionIndexes.length >= questionList.length) {
       _showQuizEndDialog();
       return;
@@ -71,26 +67,21 @@ class _QuestionScreenState extends State<QuestionScreen> {
     }
   }
 
-  //Ketika opsi dipilih
   void _onOptionSelected(String selectedOption) {
     final correctAnswer = questionList[currentQuestionIndex]['answer'] as String;
 
     if (selectedOption == correctAnswer) {
       benar++;
-      debugPrint('Benar! Total benar: $benar');
-    } else {
-      debugPrint('Salah. Jawaban benar: $correctAnswer');
     }
 
-    // Tunggu sedikit supaya user sempat lihat pilihan
     Future.delayed(const Duration(milliseconds: 500), () {
-      _generateNewQuestion();
+      if (mounted) _generateNewQuestion();
     });
   }
 
-  //Ketika semua soal habis
   void _showQuizEndDialog() {
     _timer?.cancel();
+    if (!mounted) return;
 
     context.go(
       AppRoutes.ending,
@@ -101,7 +92,6 @@ class _QuestionScreenState extends State<QuestionScreen> {
       },
     );
   }
-
 
   @override
   void dispose() {
@@ -123,9 +113,11 @@ class _QuestionScreenState extends State<QuestionScreen> {
 
     final options = List<String>.from(q['options'] as List);
 
+    final screenHeight = MediaQuery.of(context).size.height;
+    final screenWidth = MediaQuery.of(context).size.width;
+
     return Scaffold(
       backgroundColor: const Color(0xFF191970),
-
       appBar: AppBar(
         backgroundColor: const Color(0xFF6495ED),
         title: const Text(
@@ -156,108 +148,124 @@ class _QuestionScreenState extends State<QuestionScreen> {
         ],
       ),
 
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            // Timer di kanan atas
-            Align(
-              alignment: Alignment.topRight,
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.2),
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: Colors.white24, width: 1),
+      body: SafeArea(
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            return SingleChildScrollView(
+              physics: const BouncingScrollPhysics(),
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  minHeight: constraints.maxHeight,
                 ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Icon(Icons.timer, color: Colors.white, size: 20),
-                    const SizedBox(width: 6),
-                    Text(
-                      _formatTime(elapsedSeconds),
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
+                child: IntrinsicHeight(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Align(
+                          alignment: Alignment.topRight,
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.2),
+                              borderRadius: BorderRadius.circular(8),
+                              border: Border.all(color: Colors.white24, width: 1),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const Icon(Icons.timer, color: Colors.white, size: 20),
+                                const SizedBox(width: 6),
+                                Text(
+                                  _formatTime(elapsedSeconds),
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+
+                        SizedBox(height: screenHeight * 0.05),
+
+                        // Box soal (responsif)
+                        Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.all(20),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFD6E0F0),
+                            borderRadius: BorderRadius.circular(12),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.25),
+                                blurRadius: 10,
+                                spreadRadius: 5,
+                                offset: const Offset(0, 4),
+                              ),
+                            ],
+                          ),
+                          child: SizedBox(
+                            height: screenHeight * 0.18, // adaptif tinggi soal
+                            child: Center(
+                              child: AutoSizeText(
+                                q['question'] as String,
+                                textAlign: TextAlign.center,
+                                style: const TextStyle(
+                                  fontSize: 28,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                                maxLines: 3,
+                                minFontSize: 14,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ),
+                        ),
+
+                        SizedBox(height: screenHeight * 0.08),
+
+                        // Box opsi (responsif)
+                        Flexible(
+                          child: Padding(
+                            padding: const EdgeInsets.only(bottom: 24),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                opsi(
+                                  label: options[0],
+                                  color: const Color(0xFFDC143C),
+                                  onTap: () => _onOptionSelected(options[0]),
+                                ),
+                                opsi(
+                                  label: options[1],
+                                  color: const Color(0xFF3CB371),
+                                  onTap: () => _onOptionSelected(options[1]),
+                                ),
+                                opsi(
+                                  label: options[2],
+                                  color: Colors.yellow[700]!,
+                                  onTap: () => _onOptionSelected(options[2]),
+                                ),
+                                opsi(
+                                  label: options[3],
+                                  color: Colors.blue,
+                                  onTap: () => _onOptionSelected(options[3]),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
-              ),
-            ),
-
-            const SizedBox(height: 40),
-
-            //Box soal
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: const Color(0xFFD6E0F0),
-                borderRadius: BorderRadius.circular(12),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.25),
-                    blurRadius: 10,
-                    spreadRadius: 5,
-                    offset: const Offset(0, 4),
                   ),
-                ],
-              ),
-              child: SizedBox(
-                height: 150,
-                child: Center(
-                  child: AutoSizeText(
-                    q['question'] as String,
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(
-                      fontSize: 28,
-                      fontWeight: FontWeight.w500,
-                    ),
-                    maxLines: 3,
-                    minFontSize: 14,
-                    overflow: TextOverflow.ellipsis,
-                  ),
                 ),
               ),
-            ),
-
-            const SizedBox(height: 80),
-
-            // Box opsi
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.only(bottom: 24),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    opsi(
-                      label: options[0],
-                      color: const Color(0xFFDC143C),
-                      onTap: () => _onOptionSelected(options[0]),
-                    ),
-                    opsi(
-                      label: options[1],
-                      color: const Color(0xFF3CB371),
-                      onTap: () => _onOptionSelected(options[1]),
-                    ),
-                    opsi(
-                      label: options[2],
-                      color: Colors.yellow[700]!,
-                      onTap: () => _onOptionSelected(options[2]),
-                    ),
-                    opsi(
-                      label: options[3],
-                      color: Colors.blue,
-                      onTap: () => _onOptionSelected(options[3]),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ],
+            );
+          },
         ),
       ),
     );
